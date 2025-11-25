@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mini IMNUFIT Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f4f6fb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 900px;
+      width: 100%;
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 0.25rem;
+    }
+    p.subtitle {
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 2rem;
+      color: #555;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 1.25rem;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .value-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.25rem;
+    }
+    .value-row span.value {
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+    .value-row span.unit {
+      color: #777;
+    }
+    .buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .btn-minus,
+    .btn-plus {
+      flex: 1;
+      padding: 0.4rem 0.6rem;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-minus {
+      border: 1px solid #d0d4ff;
+      background: #f5f6ff;
+    }
+    .btn-plus {
+      border: none;
+      background: #2E4982;
+      color: #fff;
+    }
+    .footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Mini IMNUFIT Tracker</h1>
+    <p class="subtitle">
+      Solo para jugar y aprender 😄 — Contador simple de hábitos.
+    </p>
+
+    <div class="grid">
+      <!-- Agua -->
+      <div class="card" data-key="agua">
+        <div class="card-title">Vasos de agua</div>
+        <div class="value-row">
+          <span class="value">0</span>
+          <span class="unit">vasos</span>
+        </div>
+        <div class="buttons">
+          <button class="btn-minus">−</button>
+          <button class="btn-plus">+</button>
+        </div>
+      </div>
+
+      <!-- Ejercicio -->
+      <div class="card" data-key="ejercicio">
+        <div class="card-title">Minutos de ejercicio</div>
+        <div class="value-row">
+          <span class="value">0</span>
+          <span class="unit">min</span>
+        </div>
+        <div class="buttons">
+          <button class="btn-minus">−</button>
+          <button class="btn-plus">+</button>
+        </div>
+      </div>
+
+      <!-- Sueño -->
+      <div class="card" data-key="sueno">
+        <div class="card-title">Horas de sueño</div>
+        <div class="value-row">
+          <span class="value">0</span>
+          <span class="unit">h</span>
+        </div>
+        <div class="buttons">
+          <button class="btn-minus">−</button>
+          <button class="btn-plus">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      Versión de práctica — luego esto se convertirá en algo mucho más grande 😏
+    </div>
+  </div>
+
+  <script>
+    // Estado en memoria
+    const state = {
+      agua: 0,
+      ejercicio: 0,
+      sueno: 0,
+    };
+
+    // Cargar desde localStorage si existe
+    const saved = localStorage.getItem("mini-imnufit");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        Object.assign(state, parsed);
+      } catch (e) {}
+    }
+
+    // Inicializar tarjetas
+    document.querySelectorAll(".card").forEach(card => {
+      const key = card.getAttribute("data-key");
+      const valueEl = card.querySelector(".value");
+      const minusBtn = card.querySelector(".btn-minus");
+      const plusBtn = card.querySelector(".btn-plus");
+
+      // Set inicial
+      valueEl.textContent = state[key];
+
+      const update = (delta) => {
+        state[key] = Math.max(0, state[key] + delta);
+        valueEl.textContent = state[key];
+        localStorage.setItem("mini-imnufit", JSON.stringify(state));
+      };
+
+      minusBtn.addEventListener("click", () => update(- (key === "ejercicio" ? 5 : 1)));
+      plusBtn.addEventListener("click", () => update( key === "ejercicio" ? 5 : 1 ));
+    });
+  </script>
+</body>
+</html>
